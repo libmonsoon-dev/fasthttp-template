@@ -12,5 +12,10 @@ server: generate
 playground: generate
 	go run ./app/cmd/playground
 
-test: generate
+unit-test: generate
 	go test -v -race ./app/...
+
+e2e: generate
+	go test -v -race -tags e2e ./app/e2e/...
+
+test: unit-test e2e
