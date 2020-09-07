@@ -4,6 +4,7 @@ package di
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 	"github.com/libmonsoon-dev/fasthttp-template/app"
 	"github.com/libmonsoon-dev/fasthttp-template/app/apperr"
@@ -30,6 +31,7 @@ func CreateApp() (app.App, error) {
 		http.NewController,
 		rest.NewController,
 		rest.NewAuthController,
+		validator.New,
 		entrypoint.NewAuthEntrypoint,
 		service.NewAuthService,
 		service.NewUserService,

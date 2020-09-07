@@ -7,6 +7,7 @@ package di
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"github.com/libmonsoon-dev/fasthttp-template/app"
 	"github.com/libmonsoon-dev/fasthttp-template/app/apperr"
 	"github.com/libmonsoon-dev/fasthttp-template/app/domain"
@@ -30,10 +31,11 @@ func CreateApp() (app.App, error) {
 	}
 	waitGroup := _wireWaitGroupValue
 	logLogger := logger.NewStderrLogger()
+	validate := validator.New()
 	diRepo := newRepo()
 	userService := service.NewUserService(logLogger, diRepo)
 	authService := service.NewAuthService(logLogger, userService)
-	authEntrypoint := entrypoint.NewAuthEntrypoint(logLogger, authService)
+	authEntrypoint := entrypoint.NewAuthEntrypoint(validate, logLogger, authService)
 	authController := rest.NewAuthController(logLogger, authEntrypoint)
 	controller := rest.NewController(authController)
 	requestHandler := http.NewController(controller)
