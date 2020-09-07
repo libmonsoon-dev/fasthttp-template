@@ -13,3 +13,5 @@ func NewContext() *Context {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Context{ctx, cancel}
 }
+
+var _ context.Context = new(Context)
