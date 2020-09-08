@@ -26,11 +26,12 @@ func (as AuthService) SignUp(ctx context.Context, email string, password []byte)
 		PasswordHash: as.generatePasswordHash(password),
 	}
 
-	_, err := as.userService.Create(ctx, user)
+	id, err := as.userService.Create(ctx, user)
 	if err != nil {
 		return domain.AuthToken{}, err
 	}
 
+	user.ID = id
 	return as.GetAuthToken(user), nil
 }
 

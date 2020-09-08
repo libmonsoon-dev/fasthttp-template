@@ -43,7 +43,7 @@ func (ac AuthController) SignUp(ctx *routing.Context) error {
 		return err
 	}
 
-	return ctx.WriteData(result)
+	return ctx.WriteData(dto.AuthTokenFrom(result))
 
 }
 
@@ -62,6 +62,6 @@ func (ac AuthController) SignIn(ctx *routing.Context) error {
 		return err
 	}
 
-	return ctx.WriteData(result)
+	return ctx.WriteData(dto.AuthTokenFrom(result))
 
 }
