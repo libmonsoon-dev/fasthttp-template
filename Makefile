@@ -1,13 +1,19 @@
 all: generate typecheck test server
 
+clear:
+	rm -rf build
+
 generate:
 	go generate -x ./...
 
 typecheck:
 	go build ./...
 
-server: generate
-	go build ./app/cmd/server
+build-dir:
+	mkdir -p build
+
+server: generate build-dir
+	go build -o build/server ./app/cmd/server
 
 playground: generate
 	go run ./app/cmd/playground
