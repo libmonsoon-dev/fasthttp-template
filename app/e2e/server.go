@@ -11,22 +11,18 @@ import (
 
 const AppUrl = "http://localhost"
 
-func TestApp() (*fasthttp.Client, func())  {
-	os.Setenv(config.ServerAddressKey, AppUrl)
+func Init() (Client, func()) {
+	must(os.Setenv(config.ServerAddressKey, AppUrl))
 
-	app, err := di.CreateApp()
-	if err != nil {
-		panic(err)
-	}
+	app := mustApp(di.CreateApp())
 	listener := fasthttputil.NewInmemoryListener()
 	go app.StartForTest(listener)
-	client := &fasthttp.Client{
+
+	c := &fasthttp.Client{
 		Dial: func(string) (net.Conn, error) {
 			return listener.Dial()
 		},
 	}
 
-	return client, func() {
-		go app.ShutdownServer()
-	}
+	return NewClient(c), func() { app.ShutdownServer() }
 }
