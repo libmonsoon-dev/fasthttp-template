@@ -35,7 +35,7 @@ func CreateApp() (app.App, error) {
 		entrypoint.NewAuthEntrypoint,
 		service.NewAuthService,
 		service.NewUserService,
-		newRepo,
+		newRepo, //TODO: SQL db
 		wire.Bind(new(app.UserRepository), new(*repo)),
 	))
 }
