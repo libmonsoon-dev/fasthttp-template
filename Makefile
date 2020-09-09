@@ -1,4 +1,4 @@
-all: generate typecheck test server
+all: generate fmt typecheck test server
 
 clear:
 	rm -rf build
@@ -25,3 +25,6 @@ e2e: generate
 	go test -v -race -tags e2e ./app/e2e/...
 
 test: unit-test e2e
+
+fmt:
+	go fmt ./app
