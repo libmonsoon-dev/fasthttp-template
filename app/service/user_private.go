@@ -17,7 +17,7 @@ const (
 )
 
 // generatePasswordHash is used to generate a new password hash
-func (as AuthService) generatePasswordHash(password []byte) string {
+func (us UserService) generatePasswordHash(password []byte) string {
 
 	// Generate a Salt
 	salt := make([]byte, 16)
@@ -27,7 +27,7 @@ func (as AuthService) generatePasswordHash(password []byte) string {
 		if err == nil {
 			break
 		}
-		as.logger.Printf("AuthService.generatePasswordHash(): rand.Read(salt): ", err)
+		us.logger.Printf("AuthService.generatePasswordHash(): rand.Read(salt): ", err)
 	}
 	hash := argon2.IDKey(password, salt, argon2time, argon2memory, argon2threads, argon2keyLen)
 
@@ -41,7 +41,7 @@ func (as AuthService) generatePasswordHash(password []byte) string {
 
 // comparePassword is used to compare a user-inputted password to a hash to see
 // if the password matches or not.
-func (as AuthService) comparePassword(password []byte, hash string) bool {
+func (us UserService) comparePassword(password []byte, hash string) bool {
 	var (
 		time    uint32
 		memory  uint32
@@ -52,25 +52,25 @@ func (as AuthService) comparePassword(password []byte, hash string) bool {
 	parts := strings.Split(hash, "$")
 
 	if len(parts) != 6 {
-		as.logger.Printf("AuthService.comparePassword(): invalid hash len(parts) = %v", len(parts))
+		us.logger.Printf("AuthService.comparePassword(): invalid hash len(parts) = %v", len(parts))
 		return false
 	}
 
 	_, err := fmt.Sscanf(parts[3], "m=%d,t=%d,p=%d", &memory, &time, &threads)
 	if err != nil {
-		as.logger.Printf("AuthService.comparePassword(): Sscanf(parts[3]): %s", err)
+		us.logger.Printf("AuthService.comparePassword(): Sscanf(parts[3]): %s", err)
 		return false
 	}
 
 	salt, err := base64.RawStdEncoding.DecodeString(parts[4])
 	if err != nil {
-		as.logger.Printf("AuthService.comparePassword(): base64.RawStdEncoding.DecodeString(parts[4]): %s", err)
+		us.logger.Printf("AuthService.comparePassword(): base64.RawStdEncoding.DecodeString(parts[4]): %s", err)
 		return false
 	}
 
 	decodedHash, err := base64.RawStdEncoding.DecodeString(parts[5])
 	if err != nil {
-		as.logger.Printf("AuthService.comparePassword(): base64.RawStdEncoding.DecodeString(parts[5]): %s", err)
+		us.logger.Printf("AuthService.comparePassword(): base64.RawStdEncoding.DecodeString(parts[5]): %s", err)
 		return false
 	}
 	keyLen = uint32(len(decodedHash))

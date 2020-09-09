@@ -12,19 +12,19 @@ import (
 
 type App struct {
 	ctx    *Context
-	config *Config
 	wg     *sync.WaitGroup
 	logger Logger
 	server *fasthttp.Server
+	Root
 }
 
-func NewApp(ctx *Context, config *Config, wg *sync.WaitGroup, logger Logger, server *fasthttp.Server) App {
+func NewApp(ctx *Context, wg *sync.WaitGroup, logger Logger, server *fasthttp.Server, root Root) App {
 	return App{
 		ctx,
-		config,
 		wg,
 		logger,
 		server,
+		root,
 	}
 }
 
@@ -71,10 +71,10 @@ func (app App) startServer() {
 			runtime.Gosched()
 		}
 
-		app.logger.Printf("Server started on http://%v", app.config.ServerAddress)
+		app.logger.Printf("Server started on http://%v", app.Config.ServerAddress)
 	}()
 
-	if err := app.server.ListenAndServe(app.config.ServerAddress); err != nil {
+	if err := app.server.ListenAndServe(app.Config.ServerAddress); err != nil {
 		app.logger.Printf("%+v", err)
 	}
 }

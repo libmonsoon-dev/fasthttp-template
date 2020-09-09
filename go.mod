@@ -3,6 +3,7 @@ module github.com/libmonsoon-dev/fasthttp-template
 go 1.14
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fasthttp/router v1.2.4
 	github.com/go-ozzo/ozzo-routing v2.1.4+incompatible // indirect
 	github.com/go-playground/validator/v10 v10.3.0

@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"github.com/libmonsoon-dev/fasthttp-template/app"
 	"github.com/libmonsoon-dev/fasthttp-template/app/di"
 	"github.com/libmonsoon-dev/fasthttp-template/app/infrastructure/config"
 	"github.com/valyala/fasthttp"
@@ -11,8 +12,9 @@ import (
 
 const AppUrl = "http://localhost"
 
-func Init() (Client, func()) {
+func Init() (app.Root, Client, func()) {
 	must(os.Setenv(config.ServerAddressKey, AppUrl))
+	must(os.Setenv(config.JwtSecretKey, "JWT_SECRET"))
 
 	app := mustApp(di.CreateApp())
 	listener := fasthttputil.NewInmemoryListener()
@@ -24,5 +26,7 @@ func Init() (Client, func()) {
 		},
 	}
 
-	return NewClient(c), func() { app.ShutdownServer() }
+	return app.Root, NewClient(c), func() {
+		app.ShutdownServer()
+	}
 }

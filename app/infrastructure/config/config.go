@@ -9,6 +9,7 @@ import (
 
 const (
 	ServerAddressKey = "SERVER_ADDRESS"
+	JwtSecretKey = "JWT_SECRET"
 )
 
 func EnvironmentProvider() (*app.Config, error) {
@@ -17,8 +18,14 @@ func EnvironmentProvider() (*app.Config, error) {
 		return nil, errors.WithStack(fmt.Errorf("enviroment variable %v not defined", ServerAddressKey))
 	}
 
+	jwtSecret := os.Getenv(JwtSecretKey)
+	if jwtSecret == "" {
+		return nil, errors.WithStack(fmt.Errorf("enviroment variable %v not defined", JwtSecretKey))
+	}
+
 	config := &app.Config{
 		serverAddress,
+		[]byte(jwtSecret),
 	}
 
 	return config, nil

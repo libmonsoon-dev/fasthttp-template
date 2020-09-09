@@ -25,22 +25,27 @@ import (
 
 func CreateApp() (app.App, error) {
 	context := app.NewContext()
-	appConfig, err := config.EnvironmentProvider()
-	if err != nil {
-		return app.App{}, err
-	}
 	waitGroup := _wireWaitGroupValue
 	logLogger := logger.NewStderrLogger()
 	validate := validator.New()
 	diRepo := newRepo()
 	userService := service.NewUserService(logLogger, diRepo)
-	authService := service.NewAuthService(logLogger, userService)
+	appConfig, err := config.EnvironmentProvider()
+	if err != nil {
+		return app.App{}, err
+	}
+	authService := service.NewAuthService(logLogger, userService, appConfig)
 	authEntrypoint := entrypoint.NewAuthEntrypoint(validate, logLogger, authService)
 	authController := rest.NewAuthController(logLogger, authEntrypoint)
 	controller := rest.NewController(authController)
 	requestHandler := http.NewController(controller)
 	fasthttpServer := server.New(logLogger, requestHandler)
-	appApp := app.NewApp(context, appConfig, waitGroup, logLogger, fasthttpServer)
+	root := app.Root{
+		Config:      appConfig,
+		UserService: userService,
+		AuthService: authService,
+	}
+	appApp := app.NewApp(context, waitGroup, logLogger, fasthttpServer, root)
 	return appApp, nil
 }
 
@@ -57,14 +62,14 @@ func newRepo() *repo {
 
 type repo []domain.User
 
-func (r *repo) Store(ctx context.Context, user domain.User) (id int, err error) {
+func (r *repo) Store(ctx context.Context, user domain.User) (id int, err app.Error) {
 	id = len(*r)
 	user.ID = id
 	*r = append(*r, user)
 	return
 }
 
-func (r repo) FindById(ctx context.Context, id int) (domain.User, error) {
+func (r repo) FindById(ctx context.Context, id int) (domain.User, app.Error) {
 	for _, user := range r {
 		if user.ID == id {
 			return user, nil
@@ -77,7 +82,7 @@ func (r repo) FindById(ctx context.Context, id int) (domain.User, error) {
 	return domain.User{}, apperr.ErrItemNotFound
 }
 
-func (r repo) FindByEmail(ctx context.Context, email string) (domain.User, error) {
+func (r repo) FindByEmail(ctx context.Context, email string) (domain.User, app.Error) {
 	for _, user := range r {
 		if user.Email == email {
 			return user, nil
@@ -85,3 +90,5 @@ func (r repo) FindByEmail(ctx context.Context, email string) (domain.User, error
 	}
 	return domain.User{}, apperr.ErrItemNotFound
 }
+
+var _ app.UserRepository = new(repo)

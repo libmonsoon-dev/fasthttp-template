@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func newAuthService() *AuthService {
-	return NewAuthService(
+func newUserService() *UserService {
+	return NewUserService(
 		logger.NewStderrLogger(),
 		nil,
 	)
@@ -35,7 +35,7 @@ func TestAuthService_ComparePassword(t *testing.T) {
 		t.Run(fmt.Sprintf("#%v", i+1), func(t *testing.T) {
 			t.Parallel()
 
-			service := newAuthService()
+			service := newUserService()
 			hash := service.generatePasswordHash(test.first)
 			actual := service.comparePassword(test.second, hash)
 

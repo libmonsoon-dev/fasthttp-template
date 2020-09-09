@@ -1,11 +1,9 @@
 package dto
 
-import "github.com/libmonsoon-dev/fasthttp-template/app/domain"
-
 type AuthToken struct {
-	UserId int `json:"userId"`
+	Token string `json:"token"`
 }
 
-func AuthTokenFrom(model domain.AuthToken) AuthToken {
-	return AuthToken(model)
+func AuthTokenFrom(token string) AuthToken {
+	return AuthToken{token}
 }

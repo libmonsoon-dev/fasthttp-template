@@ -34,9 +34,12 @@ func CreateApp() (app.App, error) {
 		validator.New,
 		entrypoint.NewAuthEntrypoint,
 		service.NewAuthService,
+		wire.Bind(new(app.AuthService), new(*service.AuthService)),
 		service.NewUserService,
-		newRepo, //TODO: SQL db
+		wire.Bind(new(app.UserService), new(*service.UserService)),
+		newRepo, // TODO: SQL db
 		wire.Bind(new(app.UserRepository), new(*repo)),
+		wire.Struct(new(app.Root), "*"),
 	))
 }
 
@@ -47,14 +50,14 @@ func newRepo() *repo {
 
 type repo []domain.User
 
-func (r *repo) Store(ctx context.Context, user domain.User) (id int, err error) {
+func (r *repo) Store(ctx context.Context, user domain.User) (id int, err app.Error) {
 	id = len(*r)
 	user.ID = id
 	*r = append(*r, user)
 	return
 }
 
-func (r repo) FindById(ctx context.Context, id int) (domain.User, error) {
+func (r repo) FindById(ctx context.Context, id int) (domain.User, app.Error) {
 	for _, user := range r {
 		if user.ID == id {
 			return user, nil
@@ -67,7 +70,7 @@ func (r repo) FindById(ctx context.Context, id int) (domain.User, error) {
 	return domain.User{}, apperr.ErrItemNotFound
 }
 
-func (r repo) FindByEmail(ctx context.Context, email string) (domain.User, error) {
+func (r repo) FindByEmail(ctx context.Context, email string) (domain.User, app.Error) {
 	for _, user := range r {
 		if user.Email == email {
 			return user, nil
@@ -75,3 +78,5 @@ func (r repo) FindByEmail(ctx context.Context, email string) (domain.User, error
 	}
 	return domain.User{}, apperr.ErrItemNotFound
 }
+
+var _ app.UserRepository = new(repo)
