@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fasthttp/router v1.2.4
 	github.com/go-ozzo/ozzo-routing v2.1.4+incompatible // indirect
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/golang/gddo v0.0.0-20200715224205-051695c33a3f // indirect
